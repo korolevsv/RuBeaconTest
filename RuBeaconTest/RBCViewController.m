@@ -50,6 +50,7 @@ typedef NS_ENUM(NSUInteger, NTOperationsRow) {
 @property (nonatomic, weak) UISwitch *advertisingSwitch;
 @property (nonatomic, weak) UISwitch *rangingSwitch;
 @property (nonatomic, unsafe_unretained) void *operationContext;
+@property (weak, nonatomic) IBOutlet UILabel *numberOfBeacons;
 
 @end
 
@@ -505,9 +506,13 @@ typedef NS_ENUM(NSUInteger, NTOperationsRow) {
     
     if (filteredBeacons.count == 0) {
         NSLog(@"No beacons found nearby.");
+        self.numberOfBeacons.text = @"No";
     } else {
         NSLog(@"Found %lu %@.", (unsigned long)[filteredBeacons count],
               [filteredBeacons count] > 1 ? @"beacons" : @"beacon");
+       
+        self.numberOfBeacons.text = [NSString stringWithFormat:@"%lu", (unsigned long)[filteredBeacons count]];
+
     }
     
 /*
