@@ -89,6 +89,13 @@ typedef NS_ENUM(NSUInteger, NTOperationsRow) {
 
 
 }
+- (IBAction)stopButton:(id)sender {
+//Stop monitoring
+    [self.locationManager stopRangingBeaconsInRegion:self.beaconRegion];
+    NSLog(@"Turned off ranging.");
+    [self reportMajors:self.detectedBeacons];
+
+}
 
 
 #pragma mark - From Index Path commented
