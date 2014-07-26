@@ -70,7 +70,9 @@ typedef NS_ENUM(NSUInteger, NTOperationsRow) {
 - (IBAction)startButton:(id)sender {
     NSLog(@"Start search");
     
-    [self createBeaconRegion];
+    [self createLocationManager];
+    [self startRangingForBeacons];
+//    [self createBeaconRegion];
     [self.locationManager startRangingBeaconsInRegion:self.beaconRegion];
     
     NSLog(@"Ranging turned on for region: %@.", self.beaconRegion);
