@@ -21,6 +21,7 @@
 		532111CF198384C400BD9966 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 532111B1198384C400BD9966 /* UIKit.framework */; };
 		532111D7198384C400BD9966 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 532111D5198384C400BD9966 /* InfoPlist.strings */; };
 		532111D9198384C400BD9966 /* RuBeaconTestTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 532111D8198384C400BD9966 /* RuBeaconTestTests.m */; };
+		532111E41983858000BD9966 /* RBCBeacon.m in Sources */ = {isa = PBXBuildFile; fileRef = 532111E31983858000BD9966 /* RBCBeacon.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,6 +54,8 @@
 		532111D4198384C400BD9966 /* RuBeaconTestTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RuBeaconTestTests-Info.plist"; sourceTree = "<group>"; };
 		532111D6198384C400BD9966 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		532111D8198384C400BD9966 /* RuBeaconTestTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RuBeaconTestTests.m; sourceTree = "<group>"; };
+		532111E21983858000BD9966 /* RBCBeacon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RBCBeacon.h; sourceTree = "<group>"; };
+		532111E31983858000BD9966 /* RBCBeacon.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RBCBeacon.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +85,8 @@
 		532111A1198384C400BD9966 = {
 			isa = PBXGroup;
 			children = (
+				532111E21983858000BD9966 /* RBCBeacon.h */,
+				532111E31983858000BD9966 /* RBCBeacon.m */,
 				532111B3198384C400BD9966 /* RuBeaconTest */,
 				532111D2198384C400BD9966 /* RuBeaconTestTests */,
 				532111AC198384C400BD9966 /* Frameworks */,
@@ -251,6 +256,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				532111C4198384C400BD9966 /* RBCViewController.m in Sources */,
+				532111E41983858000BD9966 /* RBCBeacon.m in Sources */,
 				532111BE198384C400BD9966 /* RBCAppDelegate.m in Sources */,
 				532111BA198384C400BD9966 /* main.m in Sources */,
 			);

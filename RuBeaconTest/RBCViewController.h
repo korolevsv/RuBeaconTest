@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface RBCViewController : UIViewController
+@import CoreLocation;
+@import CoreBluetooth;
+
+//@interface RBCViewController : UIViewController
+@interface RBCViewController: UIViewController <CLLocationManagerDelegate, CBPeripheralManagerDelegate>
 
 @end
