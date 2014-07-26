@@ -55,6 +55,9 @@ typedef NS_ENUM(NSUInteger, NTOperationsRow) {
 @property (nonatomic, unsafe_unretained) void *operationContext;
 @property (weak, nonatomic) IBOutlet UILabel *numberOfBeacons;
 @property (weak, nonatomic) IBOutlet UILabel *majorsList;
+@property (weak, nonatomic) IBOutlet UILabel *nearBeacons;
+@property (weak, nonatomic) IBOutlet UILabel *farBeacons;
+@property (weak, nonatomic) IBOutlet UILabel *immediateBeacons;
 
 - (void)reportMajors:(NSArray *)beacons;
 
@@ -433,11 +436,32 @@ typedef NS_ENUM(NSUInteger, NTOperationsRow) {
     self.numberOfBeacons.text = [NSString stringWithFormat:@"%lu", (unsigned long)[beacons count]];
     NSLog(@"Reporting majors");
     self.majorsList.text = @"";
+    self.immediateBeacons.text = @"";
+    self.nearBeacons.text = @"";
+    self.farBeacons.text = @"";
     for (NSUInteger number = 0; number < beacons.count; number++) {
-        CLBeacon *curr = [beacons objectAtIndex:number];
-        NSString *identifier = [NSString stringWithFormat:@"%@ ", curr.major];
-        NSLog(identifier);
+        CLBeacon *currBeacon = [beacons objectAtIndex:number];
+        NSString *identifier = [NSString stringWithFormat:@"%@ ", currBeacon.major];
+//        NSLog(identifier);
         self.majorsList.text = [self.majorsList.text stringByAppendingString:identifier];
+        switch (currBeacon.proximity) {
+            case CLProximityNear: {
+                self.nearBeacons.text = [self.nearBeacons.text stringByAppendingString:identifier];
+                break;
+            }
+            case CLProximityImmediate: {
+                self.immediateBeacons.text = [self.immediateBeacons.text stringByAppendingString:identifier];
+                break;
+            }
+            case CLProximityFar: {
+                self.farBeacons.text = [self.farBeacons.text stringByAppendingString:identifier];
+                break;
+            }
+            case CLProximityUnknown:
+            default:
+                break;
+        }
+
         
     }
 
