@@ -8,8 +8,11 @@
 
 #import "RBCViewController.h"
 
-static NSString * const kUUID = @"20CAE8A0-A9CF-11E3-A5E2-0800200C9A66";
-//static NSString * const kUUID = @"RuBeacon4";
+// ONYX UUID:
+//static NSString * const kUUID = @"20CAE8A0-A9CF-11E3-A5E2-0800200C9A66";
+//Stick-N-Find UUID:
+static NSString * const kUUID = @"9F4916B1-0864-49BC-8F09-1445F9FABDEF";
+
 static NSString * const kIdentifier = @"SomeIdentifier";
 
 static NSString * const kOperationCellIdentifier = @"OperationCell";
@@ -52,6 +55,8 @@ typedef NS_ENUM(NSUInteger, NTOperationsRow) {
 @property (nonatomic, unsafe_unretained) void *operationContext;
 @property (weak, nonatomic) IBOutlet UILabel *numberOfBeacons;
 
+- (void)reportMajors:(NSArray *)beacons;
+
 @end
 
 
@@ -81,242 +86,6 @@ typedef NS_ENUM(NSUInteger, NTOperationsRow) {
 
 }
 
-/*
-#pragma mark - Index path management
-- (NSArray *)indexPathsOfRemovedBeacons:(NSArray *)beacons
-{
-    NSMutableArray *indexPaths = nil;
-    
-    NSUInteger row = 0;
-    for (CLBeacon *existingBeacon in self.detectedBeacons) {
-        BOOL stillExists = NO;
-        for (CLBeacon *beacon in beacons) {
-            if ((existingBeacon.major.integerValue == beacon.major.integerValue) &&
-                (existingBeacon.minor.integerValue == beacon.minor.integerValue)) {
-                stillExists = YES;
-                break;
-            }
-        }
-        if (!stillExists) {
-            if (!indexPaths)
-                indexPaths = [NSMutableArray new];
-            [indexPaths addObject:[NSIndexPath indexPathForRow:row inSection:NTDetectedBeaconsSection]];
-        }
-        row++;
-    }
-    
-    return indexPaths;
-}
-
-- (NSArray *)indexPathsOfInsertedBeacons:(NSArray *)beacons
-{
-    NSMutableArray *indexPaths = nil;
-    
-    NSUInteger row = 0;
-    for (CLBeacon *beacon in beacons) {
-        BOOL isNewBeacon = YES;
-        for (CLBeacon *existingBeacon in self.detectedBeacons) {
-            if ((existingBeacon.major.integerValue == beacon.major.integerValue) &&
-                (existingBeacon.minor.integerValue == beacon.minor.integerValue)) {
-                isNewBeacon = NO;
-                break;
-            }
-        }
-        if (isNewBeacon) {
-            if (!indexPaths)
-                indexPaths = [NSMutableArray new];
-            [indexPaths addObject:[NSIndexPath indexPathForRow:row inSection:NTDetectedBeaconsSection]];
-        }
-        row++;
-    }
-    
-    return indexPaths;
-}
-
-- (NSArray *)indexPathsForBeacons:(NSArray *)beacons
-{
-    NSMutableArray *indexPaths = [NSMutableArray new];
-    for (NSUInteger row = 0; row < beacons.count; row++) {
-        [indexPaths addObject:[NSIndexPath indexPathForRow:row inSection:NTDetectedBeaconsSection]];
-    }
-    
-    return indexPaths;
-}
-
-- (NSIndexSet *)insertedSections
-{
-    if (self.rangingSwitch.on && [self.beaconTableView numberOfSections] == kNumberOfSections - 1) {
-        return [NSIndexSet indexSetWithIndex:1];
-    } else {
-        return nil;
-    }
-}
-
-- (NSIndexSet *)deletedSections
-{
-    if (!self.rangingSwitch.on && [self.beaconTableView numberOfSections] == kNumberOfSections) {
-        return [NSIndexSet indexSetWithIndex:1];
-    } else {
-        return nil;
-    }
-}
-
-- (NSArray *)filteredBeacons:(NSArray *)beacons
-{
-    // Filters duplicate beacons out; this may happen temporarily if the originating device changes its Bluetooth id
-    NSMutableArray *mutableBeacons = [beacons mutableCopy];
-    
-    NSMutableSet *lookup = [[NSMutableSet alloc] init];
-    for (int index = 0; index < [beacons count]; index++) {
-        CLBeacon *curr = [beacons objectAtIndex:index];
-        NSString *identifier = [NSString stringWithFormat:@"%@/%@", curr.major, curr.minor];
-        
-        // this is very fast constant time lookup in a hash table
-        if ([lookup containsObject:identifier]) {
-            [mutableBeacons removeObjectAtIndex:index];
-        } else {
-            [lookup addObject:identifier];
-        }
-    }
-    
-    return [mutableBeacons copy];
-}
-
-#pragma mark - Table view functionality
-- (NSString *)detailsStringForBeacon:(CLBeacon *)beacon
-{
-    NSString *proximity;
-    switch (beacon.proximity) {
-        case CLProximityNear:
-            proximity = @"Near";
-            break;
-        case CLProximityImmediate:
-            proximity = @"Immediate";
-            break;
-        case CLProximityFar:
-            proximity = @"Far";
-            break;
-        case CLProximityUnknown:
-        default:
-            proximity = @"Unknown";
-            break;
-    }
-    
-    NSString *format = @"%@, %@ • %@ • %f • %li";
-    return [NSString stringWithFormat:format, beacon.major, beacon.minor, proximity, beacon.accuracy, beacon.rssi];
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    UITableViewCell *cell = nil;
-    switch (indexPath.section) {
-        case NTOperationsSection: {
-            cell = [tableView dequeueReusableCellWithIdentifier:kOperationCellIdentifier];
-            switch (indexPath.row) {
-                case NTMonitoringRow:
-                    cell.textLabel.text = kMonitoringOperationTitle;
-                    self.monitoringSwitch = (UISwitch *)cell.accessoryView;
-                    [self.monitoringSwitch addTarget:self
-                                              action:@selector(changeMonitoringState:)
-                                    forControlEvents:UIControlEventTouchUpInside];
-                    break;
-                case NTAdvertisingRow:
-                    cell.textLabel.text = kAdvertisingOperationTitle;
-                    self.advertisingSwitch = (UISwitch *)cell.accessoryView;
-                    [self.advertisingSwitch addTarget:self
-                                               action:@selector(changeAdvertisingState:)
-                                     forControlEvents:UIControlEventValueChanged];
-                    break;
-                case NTRangingRow:
-                default:
-                    cell.textLabel.text = kRangingOperationTitle;
-                    self.rangingSwitch = (UISwitch *)cell.accessoryView;
-                    [self.rangingSwitch addTarget:self
-                                           action:@selector(changeRangingState:)
-                                 forControlEvents:UIControlEventValueChanged];
-                    break;
-            }
-        }
-            break;
-        case NTDetectedBeaconsSection:
-        default: {
-            CLBeacon *beacon = self.detectedBeacons[indexPath.row];
-            
-            cell = [tableView dequeueReusableCellWithIdentifier:kBeaconCellIdentifier];
-            
-            if (!cell)
-                cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
-                                              reuseIdentifier:kBeaconCellIdentifier];
-            
-            cell.textLabel.text = beacon.proximityUUID.UUIDString;
-            cell.detailTextLabel.text = [self detailsStringForBeacon:beacon];
-            cell.detailTextLabel.textColor = [UIColor grayColor];
-        }
-            break;
-    }
-    
-    return cell;
-}
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-    if (self.rangingSwitch.on) {
-        return kNumberOfSections;       // All sections visible
-    } else {
-        return kNumberOfSections - 1;   // Beacons section not visible
-    }
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    switch (section) {
-        case NTOperationsSection:
-            return kNumberOfAvailableOperations;
-        case NTDetectedBeaconsSection:
-        default:
-            return self.detectedBeacons.count;
-    }
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-    switch (section) {
-        case NTOperationsSection:
-            return nil;
-        case NTDetectedBeaconsSection:
-        default:
-            return kBeaconSectionTitle;
-    }
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    switch (indexPath.section) {
-        case NTOperationsSection:
-            return kOperationCellHeight;
-        case NTDetectedBeaconsSection:
-        default:
-            return kBeaconCellHeight;
-    }
-}
-
-- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
-{
-    UITableViewHeaderFooterView *headerView =
-    [[UITableViewHeaderFooterView alloc] initWithReuseIdentifier:kBeaconsHeaderViewIdentifier];
-    
-    // Adds an activity indicator view to the section header
-    UIActivityIndicatorView *indicatorView =
-    [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [headerView addSubview:indicatorView];
-    
-    indicatorView.frame = (CGRect){kActivityIndicatorPosition, indicatorView.frame.size};
-    
-    [indicatorView startAnimating];
-    
-    return headerView;
-}
-*/
 
 #pragma mark - From Index Path commented
 - (NSArray *)filteredBeacons:(NSArray *)beacons
@@ -510,9 +279,6 @@ typedef NS_ENUM(NSUInteger, NTOperationsRow) {
     } else {
         NSLog(@"Found %lu %@.", (unsigned long)[filteredBeacons count],
               [filteredBeacons count] > 1 ? @"beacons" : @"beacon");
-       
-        self.numberOfBeacons.text = [NSString stringWithFormat:@"%lu", (unsigned long)[filteredBeacons count]];
-
     }
     
 /*
@@ -539,6 +305,7 @@ typedef NS_ENUM(NSUInteger, NTOperationsRow) {
         [self.beaconTableView reloadRowsAtIndexPaths:reloadedRows withRowAnimation:UITableViewRowAnimationNone];
     [self.beaconTableView endUpdates];
 */
+    [self reportMajors:self.detectedBeacons];
  }
 
 - (void)locationManager:(CLLocationManager *)manager didEnterRegion:(CLRegion *)region
@@ -661,5 +428,16 @@ typedef NS_ENUM(NSUInteger, NTOperationsRow) {
     [self turnOnAdvertising];
 }
 
+- (void)reportMajors:(NSArray *)beacons {
+    self.numberOfBeacons.text = [NSString stringWithFormat:@"%lu", (unsigned long)[beacons count]];
+    NSLog(@"Reporting majors");
+    for (NSUInteger number = 0; number < beacons.count; number++) {
+        CLBeacon *curr = [beacons objectAtIndex:number];
+        NSString *identifier = [NSString stringWithFormat:@"%@", curr.major];
+        NSLog(identifier);
+        
+    }
 
+    
+}
 @end
