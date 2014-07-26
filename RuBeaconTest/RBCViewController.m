@@ -54,6 +54,7 @@ typedef NS_ENUM(NSUInteger, NTOperationsRow) {
 @property (nonatomic, weak) UISwitch *rangingSwitch;
 @property (nonatomic, unsafe_unretained) void *operationContext;
 @property (weak, nonatomic) IBOutlet UILabel *numberOfBeacons;
+@property (weak, nonatomic) IBOutlet UILabel *majorsList;
 
 - (void)reportMajors:(NSArray *)beacons;
 
@@ -431,10 +432,12 @@ typedef NS_ENUM(NSUInteger, NTOperationsRow) {
 - (void)reportMajors:(NSArray *)beacons {
     self.numberOfBeacons.text = [NSString stringWithFormat:@"%lu", (unsigned long)[beacons count]];
     NSLog(@"Reporting majors");
+    self.majorsList.text = @"";
     for (NSUInteger number = 0; number < beacons.count; number++) {
         CLBeacon *curr = [beacons objectAtIndex:number];
-        NSString *identifier = [NSString stringWithFormat:@"%@", curr.major];
+        NSString *identifier = [NSString stringWithFormat:@"%@ ", curr.major];
         NSLog(identifier);
+        self.majorsList.text = [self.majorsList.text stringByAppendingString:identifier];
         
     }
 
